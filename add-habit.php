@@ -10,7 +10,7 @@
 
 <body>
 
-    <a href="index.php">Habit tracker</a>
+    <h1><a href="index.php">Habit tracker</a></h1>
     <?php
     if (isset($_POST["habit_name"])) {
     $servername = "localhost";

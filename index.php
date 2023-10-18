@@ -9,9 +9,16 @@
 </head>
 
 <body>
-    <a href="add-habit.php">Add habit</a>
+    <h1><a href="index.php">Habit tracker</a></h1>
+    <p>
+        <a href="add-habit.php">Add habit</a>
+    </p>
+    <p>
+        Habits for <strong><?php 
+        $date = date("Y-m-d");
+        echo $date;?></strong>
+    </p>
     <ul>
-
         <?php
         /*
         $servername = "localhost";
@@ -25,24 +32,58 @@
         $password = "Bcn.lover9";
         $dbname = "habit-tracker";
 
+        /* Complete habit */
+
+        if (isset($_GET["complete"])) {
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+        
+            $sql3 = "INSERT INTO entries (habit_id, user_id, entry_date) VALUES ('" . $_GET["complete"]. "', '1', '$date')";
+            if ($conn->query($sql3) === TRUE) {
+                echo "Habit completed<br>";
+            } else {
+                echo "Error: " . $sql3 . "<br>" . $conn->error;
+            }
+        }
+
+        /* List habit */
+
         $conn = new mysqli($servername, $username, $password, $dbname);
         if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
         }
 
-        $sql = "SELECT * FROM habits";
+        $sql = "SELECT habits.habit_id, habits.habit_name, habits.description FROM habits WHERE habits.habit_id NOT IN (SELECT habit_id FROM entries WHERE entry_date = '$date')";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            echo "<li>" . $row["habit_name"]. "</li>";
+            echo "<li>" . $row["habit_name"]. " &nbsp;<a href=\"index.php?complete=" . $row["habit_id"]. "\">✅</a></li>";
         }
         } else {
-            echo "0 results";
+            echo "All habits completed 🎉";
         }
-        $conn->close();
         ?>
+        </ul>
+        <p>
+            Completed habits
+        </p>
+        <ul>
+            <?php
+            $sql2 = "SELECT habits.habit_id, habits.habit_name, habits.description FROM habits INNER JOIN entries ON habits.habit_id = entries.habit_id WHERE entries.entry_date = '$date'";
+            $result2 = $conn->query($sql2);
 
+            if ($result2->num_rows > 0) {
+            while($row2 = $result2->fetch_assoc()) {
+                echo "<li>" . $row2["habit_name"]. "</li>";
+            }
+            } else {
+                echo "0 results";
+            }
+            $conn->close();
+            ?>
         </ul>
     </body>
 </html>
